@@ -13,8 +13,7 @@
         }
     ],
     "require": {
-        "axguowen/baidubce-common": "^1.0",
-        "axguowen/baidubce-bos": "^1.0"
+        "axguowen/baidubce-common": "^1.0"
     },
     "autoload": {
         "psr-4": {
