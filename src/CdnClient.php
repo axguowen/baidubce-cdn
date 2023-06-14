@@ -2490,12 +2490,13 @@ class CdnClient extends BceBaseClient
 
     /**
      * Create HttpClient and send request
+     * @access protected
      * @param string $httpMethod The Http request method
      * @param array $varArgs The extra arguments
      * @param string $requestPath The Http request uri
      * @return mixed The Http response and headers.
      */
-    private function sendRequest($httpMethod, array $varArgs, $requestPath = '/')
+    protected function sendRequest($httpMethod, array $varArgs, $requestPath = '/')
     {
         $defaultArgs = array(
             'config' => array(),
@@ -2531,5 +2532,122 @@ class CdnClient extends BceBaseClient
         $result = $this->parseJsonResult($response['body']);
         $result->metadata = $this->convertHttpHeadersToMetadata($response['headers']);
         return $result;
+    }
+
+    /**
+     * 检测域名ICP备案状态
+     * @param array $options None
+     * @param string $domain [<the domain name>]
+     * @return response
+     * @throws BceClientException
+     */
+    public function checkDomainICP($domain, $options = array())
+    {
+        if (empty($domain)) {
+            throw new BceClientException("The parameter domain should NOT be null");
+        }
+
+        list($config) = $this->parseOptionsIgnoreExtra($options, 'config');
+
+        if (!empty($config)) {
+            unset($options['config']);
+        }
+        $params = $options;
+
+        return $this->sendRequest(
+            HttpMethod::GET,
+            array(
+                'config' => $config,
+                'params' => $params,
+            ),
+            '/domain/'.$domain.'/icp'
+        );
+    }
+
+    /**
+     * 增加&修改域名证书
+     * @param string $domain
+     * @param array $options None
+     * @return mixed
+     * @throws BceClientException
+     */
+    public function setCertificate($domain,$options = array())
+    {
+        if (empty($domain)) {
+            throw new BceClientException("The parameter domain should NOT be null");
+        }
+        $body['httpsEnable'] = 'ON';
+        $body['certificate'] = $options;
+
+        return $this->sendRequest(
+            HttpMethod::PUT,
+            array(
+                'body' => json_encode($body),
+            ),
+            '/'.$domain.'/certificates'
+        );
+    }
+
+    /**
+     * 查询域名证书
+     * @param string $domain
+     * @return mixed
+     * @throws BceClientException
+     */
+    public function getCertificate($domain)
+    {
+        if (empty($domain)) {
+            throw new BceClientException("The parameter domain should NOT be null");
+        }
+        return $this->sendRequest(
+            HttpMethod::GET,
+            array(
+            ),
+            '/'.$domain.'/certificates'
+        );
+    }
+
+    /**
+     * 删除域名证书
+     * @param string $domain
+     * @return mixed
+     * @throws BceClientException
+     */
+    public function delCertificate($domain)
+    {
+        if (empty($domain)) {
+            throw new BceClientException("The parameter domain should NOT be null");
+        }
+        return $this->sendRequest(
+            HttpMethod::DELETE,
+            array(
+            ),
+            '/'.$domain.'/certificates'
+        );
+    }
+
+    /**
+     * 查询域名归属权验证方法
+     * @param array $options None
+     * @param string $domain [<the domain name>]
+     * @param array $origin [<the origin address list>]
+     * @return response
+     * @throws BceClientException
+     */
+    public function howToVerify($domain)
+    {
+        if (empty($domain)) {
+            throw new BceClientException("The parameter domain should NOT be null");
+        }
+
+        $params = [];
+
+        return $this->sendRequest(
+            HttpMethod::GET,
+            array(
+                'params' => $params,
+            ),
+            '/domain/'.$domain . '/how-to-verify'
+        );
     }
 }
