@@ -1614,9 +1614,12 @@ class CdnClient extends BceBaseClient
             throw new BceClientException("The parameter flag should be black or white");
 
         }
+
+        /*/ 去除AclList为空的校验
         if (empty($aclList)) {
             throw new BceClientException("Acl list is empty, please check your input");
         }
+        //*/
 
         list($config) = $this->parseOptionsIgnoreExtra($options, 'config');
 
