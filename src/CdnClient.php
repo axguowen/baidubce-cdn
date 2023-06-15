@@ -2531,6 +2531,8 @@ class CdnClient extends BceBaseClient
 
         $result = $this->parseJsonResult($response['body']);
         $result->metadata = $this->convertHttpHeadersToMetadata($response['headers']);
+        //返回http状态码
+		$result->statuscode = $response['statuscode'];
         return $result;
     }
 
